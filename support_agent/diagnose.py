@@ -1,15 +1,18 @@
-"""Diagnosis step: given a customer's support message, use the curated
-Tariflow-AI technical knowledge to produce (a) an internal diagnosis and
-(b) a natural-language call task for CALL-E's own calling agent to execute.
+"""Diagnosis step: given a customer's support message and a codebase's
+ingested technical context, produce (a) an internal diagnosis and (b) a
+natural-language call task for CALL-E's own calling agent to execute.
+
+The context is now always passed in (from repo_ingest.ingest_codebase),
+not imported as a fixed constant -- this is what makes the agent work on
+any codebase, not just one it was demoed on.
 """
 
 from google import genai
 
-from support_agent.codebase_context import TARIFLOW_CONTEXT
 from support_agent.config import GOOGLE_API_KEY, TEXT_MODEL
 
-DIAGNOSIS_PROMPT = """You are the internal diagnosis engine for Tariflow-AI's technical support system. \
-You have deep, accurate knowledge of exactly how the product works -- use it, don't guess.
+DIAGNOSIS_PROMPT = """You are the internal diagnosis engine for this product's technical support system. \
+You have been given real, current knowledge of exactly how the product works -- use it, don't guess.
 
 {context}
 
@@ -19,9 +22,10 @@ A customer has raised this issue:
 Do two things:
 
 1. DIAGNOSIS: Identify the most likely real technical cause, citing the specific mechanism \
-from the knowledge base above (e.g. the exact size threshold, header, cache TTL, or queue \
-involved). If multiple causes are plausible, name the most likely one and one alternative to \
-rule out.
+from the knowledge base above (an exact function, endpoint, limit, or config value if one is \
+relevant). If multiple causes are plausible, name the most likely one and one alternative to \
+rule out. If the knowledge base genuinely doesn't cover this issue, say so plainly rather than \
+inventing a mechanism that isn't there.
 
 2. CALL_TASK: Write clear, natural-language instructions for a calling agent who will phone \
 this customer to walk them through the issue. It must be warm and direct, explain the real \
@@ -38,9 +42,9 @@ CALL_TASK:
 """
 
 
-def diagnose(customer_message: str) -> dict:
+def diagnose(customer_message: str, codebase_context: str) -> dict:
     """Returns {"diagnosis": str, "call_task": str}."""
-    prompt = DIAGNOSIS_PROMPT.format(context=TARIFLOW_CONTEXT, customer_message=customer_message)
+    prompt = DIAGNOSIS_PROMPT.format(context=codebase_context, customer_message=customer_message)
 
     client = genai.Client(api_key=GOOGLE_API_KEY)
     response = client.models.generate_content(model=TEXT_MODEL, contents=prompt)

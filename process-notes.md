@@ -32,7 +32,38 @@
   ingestion), single outbound-call flow, narrow scenario coverage. Full
   list of what's deferred to the deepening pass is in the README.
 
-## Still needed before submission (deadline: 2026-09-14, 11:45pm SGT)
+## Day 3 (2026-09-13) -- deepening pass
+
+- Rolex flagged, correctly, that Tariflow-AI (the demo codebase from day 1)
+  is actually a **private** repo -- verified via `gh repo view`. Rolex's
+  stated policy is that private repos are mostly real business ideas, so
+  grounding a public submission's content in it was a real miss on my
+  part; I should have checked visibility before choosing it, not after.
+  Rolex later judged, after seeing what was actually exposed, that the
+  content didn't reveal meaningful architecture and was comfortable
+  leaving the existing history as-is rather than requiring a repo
+  delete/recreate -- noted here as his explicit call, not something I
+  decided unilaterally.
+- Verified `stocksphere` (a candidate Rolex asked about) is also private.
+  Confirmed two genuinely public, technical candidates instead:
+  `LightOnOCR-Server` (FastAPI/RQ/Redis OCR queue) and `fast-mmg` (payment
+  integration layer) -- both verified via `gh repo view --json isPrivate`
+  before use, not assumed.
+- Bigger fix, prompted by Rolex directly asking whether this "spins up on
+  any codebase" -- it didn't yet; day 1's build was a hand-curated,
+  single-codebase-specific snapshot. Rebuilt as genuine generic ingestion
+  (`support_agent/repo_ingest.py`): given any local path or git URL, reads
+  the real README + a capped sample of real source files at call time.
+  `diagnose()` now takes this as a parameter instead of importing a fixed
+  constant. Verified for real (zero-cost, just a git clone) against the
+  live LightOnOCR-Server repo -- 8,159 characters of real content ingested
+  correctly on the first try.
+- Demo plan upgraded accordingly: show the same agent correctly diagnosing
+  issues against two unrelated real codebases (LightOnOCR-Server and
+  fast-mmg) in the video, which is a much stronger proof of genericity
+  than one example.
+
+## Still needed before submission (deadline: 2026-09-14, 11:45am Guyana time / 11:45pm SGT)
 
 - One real end-to-end test call once Rolex provides `GOOGLE_API_KEY` and
   `CALLE_API_KEY`.
