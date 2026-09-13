@@ -23,6 +23,9 @@ customer support message
    diagnosis + a natural-language call task
         |
         v
+  no-call preview printed  <-- default stop point, nothing dialed yet
+        |
+        v  (only with --dispatch)
 +--------------------+
 |  CALL-E             |     places the real phone call, has the live
 |  (calls.create_and_ |     conversation, confirms resolution, returns a
@@ -30,15 +33,24 @@ customer support message
 +--------------------+
 ```
 
+## Safety: no-call preview by default
+
+A customer's message flows straight into an LLM diagnosis — that diagnosis should never flow straight into a real phone call with no human in the loop. Running `main.py` **always** prints the diagnosis and the exact call task first and stops there; a real call is only placed with an explicit `--dispatch` flag, after you've reviewed what CALL-E is about to say. No credentials are even required for the preview path.
+
 ## Running it
 
 ```bash
 pip install -r requirements.txt
 cp .env.example .env   # fill in GOOGLE_API_KEY and CALLE_API_KEY
+
+# Preview only -- diagnosis + call task printed, nothing dialed.
 python main.py "+15550123456" "My 5MB customs document upload isn't showing up in the operation list"
+
+# After reviewing the preview, place the real call:
+python main.py "+15550123456" "My 5MB customs document upload isn't showing up in the operation list" --dispatch
 ```
 
-Set `SUPPORT_MOCK=1` in `.env` to run the diagnosis step without placing a real call (useful for testing without spending CALL-E call credits).
+Set `SUPPORT_MOCK=1` in `.env` to run `--dispatch` against a stub instead of a real call (useful for testing the full flow without spending CALL-E call credits).
 
 ### Testing without spending anything
 
@@ -50,16 +62,16 @@ Mocks the CALL-E SDK entirely and verifies the integration against the real inst
 
 ## What's built today vs. what's next
 
-**Built (light pass, day 1 of 3):**
+**Built:**
 - A curated, accurate technical knowledge snapshot of Tariflow-AI (`support_agent/codebase_context.py`) — read directly from the real source, not invented.
 - A diagnosis step that cites the real mechanism behind a customer's issue.
+- A no-call preview default with an explicit `--dispatch` flag required before any real call is placed — matching the safety pattern used across CALL-E's own community submissions.
 - A working, tested CALL-E integration that places a real phone call with a structured result schema (`issue_resolved`, `customer_sentiment`, `summary`, `follow_up_needed`).
 
-**Next (deepening pass):**
+**Next:**
 - Replace the static knowledge snapshot with live repo ingestion (read the actual current source at call time, so the agent stays correct as the codebase changes) — the static snapshot becomes the correctness baseline live ingestion gets checked against.
 - Broader scenario coverage beyond upload/cache/rate-limit issues.
 - A real inbound-call path (customer calls in) in addition to the current outbound diagnose-then-call flow.
-- The PR to CALL-E's [awesome-phone-call-agents](https://github.com/CALLE-AI/awesome-phone-call-agents) submission repo.
 
 ## License
 
