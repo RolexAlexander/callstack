@@ -18,6 +18,31 @@ With `--dispatch`, CALL-E placed a real call to the Twilio number and had a live
 
 CALL-E's supported-regions list does not include Guyana in any language (verified directly against their docs) -- a genuine platform constraint, not a bug in this project. `support_agent/calle_client.py` already handles the resulting `CalleAPIError` gracefully (see git history) rather than crashing, and this is documented here so it doesn't read as an oversight.
 
+## Second codebase, same agent: fast-mmg
+
+To prove genericity further, the same agent (unchanged code) was pointed at a
+completely different real repo -- [fast-mmg](https://github.com/RolexAlexander/fast-mmg),
+a payment integration layer, nothing like an OCR job queue.
+
+Customer message: *"My payment signature keeps getting rejected by the API"*
+
+The diagnosis correctly cited real, specific mechanics from the actual source:
+the RSA key pair used in the signed checkout flow (`signed_server/main.py`),
+the `PUBLIC_KEY_PATH`/`PRIVATE_KEY_PATH` convention naming keys after the
+merchant MID, and the `SECRET_KEY`/`CLIENT_ID`/`MERCHANT_MSISDN` environment
+variables packaged into the encrypted token. The call task walked through
+checking the `keys/` directory, verifying `docker-compose.yml` env vars
+match MMG's registered credentials, and testing `/generate-checkout` again.
+
+**This one was not dispatched** -- the CALL-E account hit `insufficient_balance`
+at the moment of dispatch. That's a real, honestly-surfaced account-balance
+limit, not a code failure: the error was caught cleanly by
+`support_agent/calle_client.py`'s `CalleAPIError` handling (`{"status":
+"error", "error_code": "insufficient_balance", ...}`) rather than crashing --
+which is itself evidence the error-handling work held up under a real,
+unplanned failure mode. Worth showing in the demo video as a no-call preview:
+different codebase, correctly diagnosed, same unmodified agent.
+
 ## Honest gap in this record
 
 The structured JSON result (`issue_resolved`, `customer_sentiment`, `summary`, `follow_up_needed`) wasn't captured locally -- the polling script was intentionally stopped mid-wait, and CALL-E's API has no list-calls endpoint to retrieve it after the fact without the call ID. The call itself and its content are independently confirmed by Rolex having actually received and heard it. If the CALL-E web dashboard shows call history/transcripts, pull the transcript from there for the demo video rather than relying on this file alone.
