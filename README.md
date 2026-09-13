@@ -1,12 +1,20 @@
-# Codebase Support Agent
+<p align="center">
+  <img src="assets/logo.png" alt="Callstack logo" width="160">
+</p>
 
-**A technical support agent that actually understands *your* codebase — whatever it is — built for [CALL-E: Your Code Is Calling](https://call-e.devpost.com/).**
+# Callstack
 
-Most support bots read a FAQ. This one reads the actual product: point it at any codebase (a local path or a git URL) and it ingests the real README and source, uses that to diagnose a customer's technical issue correctly, then hands [CALL-E](https://call-e.devpost.com/) a task to actually phone the customer and walk them through the real fix. Demoed against two unrelated real services — [LightOnOCR-Server](https://github.com/RolexAlexander/LightOnOCR-Server) (a FastAPI/RQ/Redis OCR job queue) and [fast-mmg](https://github.com/RolexAlexander/fast-mmg) (a payment integration layer) — to prove it's genuinely generic, not tuned to one product.
+**Ingest your codebase. Answer your customers' technical calls. Built for [CALL-E: Your Code Is Calling](https://call-e.devpost.com/).**
+
+Callstack is a technical support agent that actually understands *your* codebase — whatever it is. Point it at any repo (a local path or a git URL), and it ingests the real README and source, uses that to diagnose a customer's technical problem correctly, then hands [CALL-E](https://call-e.devpost.com/) a task to actually phone the customer and walk them through the real fix. Demoed against two unrelated real services — [LightOnOCR-Server](https://github.com/RolexAlexander/LightOnOCR-Server) (a FastAPI/RQ/Redis OCR job queue) and [fast-mmg](https://github.com/RolexAlexander/fast-mmg) (a payment integration layer) — to prove it's genuinely generic, not tuned to one product.
+
+## The one-line story
+
+**Ingest a codebase → understand how it actually works → answer your customers' technical problems on the phone, grounded in what's really there.**
 
 ## Why this, not another FAQ bot
 
-Early-stage founders lose enormous amounts of time to technical support — especially the kind that requires actually knowing how the product works internally, not just matching keywords to a help article. This agent's diagnosis step is grounded in whatever real source it's pointed at: exact endpoints, queue names, rate limits, cache behavior, config values — so it can say something concrete and specific instead of a generic "have you tried restarting."
+Early-stage founders lose enormous amounts of time to technical support — especially the kind that requires actually knowing how the product works internally, not just matching keywords to a help article. Callstack's diagnosis step is grounded in whatever real source it's pointed at: exact endpoints, queue names, rate limits, cache behavior, config values — so it can say something concrete and specific instead of a generic "have you tried restarting."
 
 ## How it works
 

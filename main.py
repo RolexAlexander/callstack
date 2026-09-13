@@ -1,4 +1,4 @@
-"""Tariflow Support Agent -- CLI entrypoint.
+"""Callstack -- CLI entrypoint.
 
 Given ANY codebase (a local path or a git URL) and a customer's technical
 support message, ingests the real codebase, diagnoses the real cause, then
@@ -61,7 +61,7 @@ def run(repo: str, phone: str, customer_message: str, dispatch: bool) -> None:
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Codebase-grounded technical support agent")
+    parser = argparse.ArgumentParser(description="Callstack -- codebase-grounded technical support agent")
     parser.add_argument(
         "--repo",
         required=True,

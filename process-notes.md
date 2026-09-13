@@ -63,11 +63,21 @@
   fast-mmg) in the video, which is a much stronger proof of genericity
   than one example.
 
+- Renamed the project to **Callstack** (call stack + phone calls) once the
+  build genuinely became a generic framework rather than a one-codebase
+  tool -- fitting, since the name only became honest after the ingestion
+  rewrite above. Renamed the GitHub repo, local directory, git remote, and
+  updated the already-open PR (#536) to match, rather than leaving stale
+  branding in a submission that had already moved past it. Added Rolex's
+  logo to `assets/logo.png`.
+- PR to `CALLE-AI/awesome-phone-call-agents` opened and kept in sync with
+  the rename: https://github.com/CALLE-AI/awesome-phone-call-agents/pull/536
+
 ## Still needed before submission (deadline: 2026-09-14, 11:45am Guyana time / 11:45pm SGT)
 
-- One real end-to-end test call once Rolex provides `GOOGLE_API_KEY` and
-  `CALLE_API_KEY`.
-- The PR to `CALLE-AI/awesome-phone-call-agents` per submission requirements.
-- 3-minute demo video.
-- Broaden scenario coverage and consider live repo ingestion during the
-  deepening pass.
+- One real end-to-end test call now that Rolex has `GOOGLE_API_KEY` and
+  `CALLE_API_KEY` ready to add.
+- 3-minute demo video -- plan: same agent against two unrelated repos
+  (LightOnOCR-Server, fast-mmg) to make the genericity claim visible, not
+  just asserted.
+- Broaden scenario coverage if time allows.
