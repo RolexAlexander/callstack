@@ -61,7 +61,21 @@ def run_support_call(phone_e164: str, task: str) -> dict:
             recipient={"phones": [phone_e164]},
             result_schema=RESULT_SCHEMA,
         )
-        return call.get("structured_result", call)
+        structured = call.get("structured_result")
+        if structured is not None:
+            return structured
+        # Structured extraction can come back None even on a real, completed
+        # call (e.g. the model couldn't confidently fill the schema) -- fall
+        # back to the call's own top-level fields instead of returning None
+        # and losing all visibility into what actually happened.
+        return {
+            "status": call.get("status"),
+            "summary": call.get("summary"),
+            "task_completed": call.get("task_completed"),
+            "failure_code": call.get("failure_code"),
+            "failure_message": call.get("failure_message"),
+            "raw": call,
+        }
     except CalleAPIError as exc:
         # e.g. an unsupported region/language combination for this number --
         # a real, expected rejection, not a crash.

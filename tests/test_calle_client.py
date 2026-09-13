@@ -46,6 +46,30 @@ class TestRunSupportCall(unittest.TestCase):
         self.assertTrue(result["issue_resolved"])
 
 
+    def test_none_structured_result_falls_back_to_call_fields_not_none(self):
+        # Real bug caught on a real call: structured_result key was present
+        # but its value was None (extraction didn't confidently fill the
+        # schema on a real completed call) -- must not silently return None.
+        fake_client = MagicMock()
+        fake_client.calls.create_and_wait.return_value = {
+            "structured_result": None,
+            "status": "completed",
+            "summary": "Discussed the stuck OCR job with the customer.",
+            "task_completed": True,
+            "failure_code": None,
+            "failure_message": None,
+        }
+
+        with patch.object(calle_client, "MOCK", False), patch.object(
+            calle_client, "CALLE_API_KEY", "fake-key"
+        ), patch("support_agent.calle_client.CalleClient", return_value=fake_client):
+            result = calle_client.run_support_call("+15550123456", "task text")
+
+        self.assertIsNotNone(result)
+        self.assertEqual(result["status"], "completed")
+        self.assertEqual(result["summary"], "Discussed the stuck OCR job with the customer.")
+        self.assertTrue(result["task_completed"])
+
     def test_calle_api_error_returns_clean_dict_not_crash(self):
         from calle.errors import CalleAPIError
 
