@@ -46,5 +46,26 @@ class TestRunSupportCall(unittest.TestCase):
         self.assertTrue(result["issue_resolved"])
 
 
+    def test_calle_api_error_returns_clean_dict_not_crash(self):
+        from calle.errors import CalleAPIError
+
+        fake_client = MagicMock()
+        fake_client.calls.create_and_wait.side_effect = CalleAPIError(
+            code="unsupported_region_language",
+            message="Calls for Guyana in English are not supported.",
+            status_code=422,
+            details={"region": "GY", "language": "en"},
+        )
+
+        with patch.object(calle_client, "MOCK", False), patch.object(
+            calle_client, "CALLE_API_KEY", "fake-key"
+        ), patch("support_agent.calle_client.CalleClient", return_value=fake_client):
+            result = calle_client.run_support_call("+5926877233", "task text")
+
+        self.assertEqual(result["status"], "error")
+        self.assertEqual(result["error_code"], "unsupported_region_language")
+        fake_client.close.assert_called_once()
+
+
 if __name__ == "__main__":
     unittest.main()

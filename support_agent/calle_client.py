@@ -9,6 +9,7 @@ for free before spending real call credits.
 """
 
 from calle import CalleClient
+from calle.errors import CalleAPIError
 
 from support_agent.config import CALLE_API_KEY, MOCK
 
@@ -61,5 +62,16 @@ def run_support_call(phone_e164: str, task: str) -> dict:
             result_schema=RESULT_SCHEMA,
         )
         return call.get("structured_result", call)
+    except CalleAPIError as exc:
+        # e.g. an unsupported region/language combination for this number --
+        # a real, expected rejection, not a crash.
+        return {
+            "status": "error",
+            "error_code": exc.code,
+            "error": str(exc),
+            "details": exc.details,
+        }
+    except Exception as exc:  # noqa: BLE001
+        return {"status": "error", "error": str(exc)}
     finally:
         client.close()
